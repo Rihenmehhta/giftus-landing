@@ -1,0 +1,80 @@
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { useRouter } from "next/router";
+
+export default function GiftUsForm() {
+  const [name, setName] = useState("");
+  const [bride, setBride] = useState("");
+  const [groom, setGroom] = useState("");
+  const [hobbies, setHobbies] = useState("");
+  const [budget, setBudget] = useState("");
+  const [plans, setPlans] = useState("");
+  const [gifts, setGifts] = useState([{ item: "", link: "", reason: "" }]);
+
+  const router = useRouter();
+
+  const handleGiftChange = (index, field, value) => {
+    const newGifts = [...gifts];
+    newGifts[index][field] = value;
+    setGifts(newGifts);
+  };
+
+  const addGift = () => {
+    setGifts([...gifts, { item: "", link: "", reason: "" }]);
+  };
+
+  const handleSubmit = () => {
+    const data = {
+      name,
+      bride,
+      groom,
+      hobbies,
+      budget,
+      plans,
+      gifts,
+    };
+    const encoded = encodeURIComponent(JSON.stringify(data));
+    router.push(`/view?data=${encoded}`);
+  };
+
+  return (
+    <div className="max-w-2xl mx-auto p-4 space-y-4">
+      <h1 className="text-2xl font-bold text-center">GiftUs: Make Your Wishlist</h1>
+      <Input placeholder="Your Name" value={name} onChange={(e) => setName(e.target.value)} />
+      <Input placeholder="Bride's Name" value={bride} onChange={(e) => setBride(e.target.value)} />
+      <Input placeholder="Groom's Name" value={groom} onChange={(e) => setGroom(e.target.value)} />
+      <Input placeholder="Hobbies" value={hobbies} onChange={(e) => setHobbies(e.target.value)} />
+      <Input placeholder="Marriage Budget" value={budget} onChange={(e) => setBudget(e.target.value)} />
+      <Input placeholder="Plans After Marriage" value={plans} onChange={(e) => setPlans(e.target.value)} />
+
+      <div className="space-y-2">
+        {gifts.map((gift, index) => (
+          <Card key={index} className="p-2">
+            <CardContent className="space-y-2">
+              <Input
+                placeholder="Gift Item"
+                value={gift.item}
+                onChange={(e) => handleGiftChange(index, "item", e.target.value)}
+              />
+              <Input
+                placeholder="Gift Link (optional)"
+                value={gift.link}
+                onChange={(e) => handleGiftChange(index, "link", e.target.value)}
+              />
+              <Input
+                placeholder="Why this gift?"
+                value={gift.reason}
+                onChange={(e) => handleGiftChange(index, "reason", e.target.value)}
+              />
+            </CardContent>
+          </Card>
+        ))}
+        <Button variant="outline" onClick={addGift}>+ Add Another Gift</Button>
+      </div>
+
+      <Button className="w-full" onClick={handleSubmit}>Generate Wishlist Page</Button>
+    </div>
+  );
+}
